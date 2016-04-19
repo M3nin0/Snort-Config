@@ -1,8 +1,12 @@
 #!/bin/bash
 
+snort_config(){
+echo "Realizando os updates!!!"
+echo "Apos os updates reinicie a maquina"
+sleep 3
+clear
 apt-get update
 apt-get upgrade -y
-echo "Por favor reinicie a maquina!!!"
 sleep 10
 apt-get install flex bison build-essential checkinstall libpcap-dev libnet1-dev libpcre3-dev libnetfilter-queue-dev iptables-dev libdumbnet-dev -y
 
@@ -63,30 +67,15 @@ chown -R snort:snort /usr/local/lib/snort_dynamicrules
 cp /usr/src/snort_src/snort*/etc/*.conf* /etc/snort
 cp /usr/src/snort_src/snort*/etc/*.map /etc/snort
 
+}
 
-# Configurando seu bloco de IP
-# Para Snort não fazer log de sua propria rede 
+ROT=$(id -u)
 
-echo "Dentro da pasta /etc/snort/snort.conf"
-echo "Modifique a linha 45 onde há HOME_NET"
-echo "Caso não esteja, provavelmente estará mais abaixo ou acima"
-echo "Fica assim ipvar HOME_NET IP_DESEJADO"
-sleep 120
+if [ "$ROT" = "0" ];then
+	snort_config
 
-# Gerando regras 
+else
+	echo "O script abre apenas com ROOT"
+	exit
 
-var RULE_PATH /etc/snort/rules
-var SO_RULE_PATH /etc/snort/so_rules
-var PREPROC_RULE_PATH /etc/snort/preproc_rules
-var WHITE_LIST_PATH /etc/snort/rules
-var BLACK_LIST_PATH /etc/snort/rules
-
-
-# Configurações finalizadas!!!
-
-echo "Para testar o Snort digite: "
-echo "snort -T -c /etc/snort/snort.conf"
-sleep 20
-clear
-echo "Até mais!!!"
-sleep 5
+fi
