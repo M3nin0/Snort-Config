@@ -7,66 +7,92 @@ sleep 3
 clear
 apt-get update
 apt-get upgrade -y
+echo "Reinicie o equipamento se ainda nao o fez"
 sleep 10
-apt-get install flex bison build-essential checkinstall libpcap-dev libnet1-dev libpcre3-dev libnetfilter-queue-dev iptables-dev libdumbnet-dev -y
 
-mkdir /usr/src/snort_src
-cd /usr/src/snort_src
+echo "Iniciando configuraçao do Snort"
+sleep 3
 
-# Instalando o Data Acquisition Library (DAQ)
+#Instalando pre-requisitos
+sudo apt-get install -y build-essential
+sudo apt-get install -y libpcap-dev libpcre3-dev libdumbnet-dev
 
-wget https://www.snort.org/downloads/snort/daq-2.0.6.tar.gz
+#Criando pasta de instalaçao
+mkdir ~/snort_src
+cd ~/snort_src
 
+sudo apt-get install -y bison flex
+
+#Instalando DAQ 2.0.6
+wget https://snort.org/downloads/snort/daq-2.0.6.tar.gz
 tar xvfz daq-2.0.6.tar.gz
 cd daq-2.0.6
+./configure && make && sudo make install
 
-./configure; make; make install
+#Iniciando instalaçao do Snort
+#Instalando dependencias
+sudo apt-get install -y zlib1g-dev liblzma-dev openssl libssl-dev
+cd ~/snort_src
+wget https://snort.org/downloads/snort/snort-2.9.8.2.tar.gz
+tar xvfz snort-2.9.8.2.tar.gz
+cd snort-2.9.8.2
+./configure --enable-sourcefire && make && sudo make install
 
-# Instalando Snort
+#Atualizando bibliotecas compartilhadas
+sudo ldconfig
 
-cd /usr/src/snort_src
+#Gerando symlink do Snort
+sudo ln -s /usr/local/bin/snort /usr/sbin/snort
 
-wget https://www.snort.org/downloads/snort/snort-2.9.8.0.tar.gz
+#Verificando versao
+echo "Versao do Snort:"
+snort -V
+sleep 5
 
-tar xvfz snort-2.9.8.0.tar.gz
-cd snort-2.9.8.0
+#Configurando Snort em NIDS
+#Criando usuario e grupo do Snort
+sudo groupadd snort
+sudo useradd snort -r -s /sbin/nologin -c SNORT_IDS -g snort
 
-./configure --enable-sourcefire; make; make install
+#Criando os diretorios Snort
+sudo mkdir /etc/snort
+sudo mkdir /etc/snort/rules
+sudo mkdir /etc/snort/rules/iplists
+sudo mkdir /etc/snort/preproc_rules
+sudo mkdir /usr/local/lib/snort_dynamicrules
+sudo mkdir /etc/snort/so_rules
 
-ldconfig
+#Criando ficheiros para alocar as regras
+sudo touch /etc/snort/rules/iplists/black_list.rules
+sudo touch /etc/snort/rules/iplists/white_list.rules 
+sudo touch /etc/snort/rules/local.rules
+sudo touch /etc/snort/sid-msg.map
 
-snort --version
+#Criando diretorios de log
+sudo mkdir /var/log/snort
+sudo mkdir /var/log/snort/archived_logs
 
-ln -s /usr/local/bin/snort /usr/sbin/snort
-snort --version
+#Definindo permissoes
+sudo chmod -R 5775 /etc/snort
+sudo chmod -R 5775 /var/log/snort
+sudo chmod -R 5775 /var/log/snort/archived_logs
+sudo chmod -R 5775 /etc/snort/so_rules
+sudo chmod -R 5775 /usr/local/lib/snort_dynamicrules
 
+#Definindo controle das pastas
+sudo chown -R snort:snort /etc/snort
+sudo chown -R snort:snort /var/log/snort
+sudo chown -R snort:snort /usr/local/lib/snort_dynamicrules
 
-# Deixando Snort para todos os usuarios
+#Copiando arquivos de configuraçao
+cd ~/snort_src/snort-2.9.8.2/etc/
+sudo cp *.conf* /etc/snort
+sudo cp *.map /etc/snort
+sudo cp *.dtd /etc/snort
+cd ~/snort_src/snort-2.9.8.2/src/dynamic-preprocessors/build/usr/local/lib/snort_dynamicrules
+sudo cp * /etc/local/lib/snort_dynamicrules
 
-groupadd snort
-useradd snort -r -s /sbin/nologin -c SNORT_IDS -g snort
-
-mkdir /etc/snort
-mkdir /etc/snort/rules
-mkdir /etc/snort/preproc_rules
-touch /etc/snort/rules/white_list.rules /etc/snort/rules/black_list.rules /etc/snort/rules/local.rules
-
-mkdir /var/log/snort
-
-mkdir /usr/local/lib/snort_dynamicrules
-
-chmod -R 5775 /etc/snort
-chmod -R 5775 /var/log/snort
-chmod -R 5775 /usr/local/lib/snort_dynamicrules
-chown -R snort:snort /etc/snort
-chown -R snort:snort /var/log/snort
-chown -R snort:snort /usr/local/lib/snort_dynamicrules 
-
-# Gerando os ficheiros de configuração
-
-cp /usr/src/snort_src/snort*/etc/*.conf* /etc/snort
-cp /usr/src/snort_src/snort*/etc/*.map /etc/snort
-
+sudo sed -i "s/include \$RULE\_PATH/#include \$RULE\_PATH/" /etc/snort/snort.conf
 }
 
 ROT=$(id -u)
