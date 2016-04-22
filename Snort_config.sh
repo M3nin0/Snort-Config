@@ -101,6 +101,16 @@ echo "Digite o IP e a classe que sera utilizado (Exemplo:10.0.0.0/24): "
 read IPCLASS
 sudo sed -i "s/# Setup the network addresses you are protecting/ipvar HOME_NET $IPCLASS/g" /etc/snort/snort.conf
 
+#Escrevendo caminho das regras
+sudo sed -i "s/var RULE_PATH ..\/rules/var RULE_PATH \/etc\/snort\/rules/g" /etc/snort/snort.conf
+sudo sed -i "s/var SO_RULE_PATH ..\/so_rules/var SO_RULE_PATH \/etc\/snort\/so_rules/g" /etc/snort/snort.conf
+sudo sed -i "s/var PREPROC_RULE_PATH ..\/preproc_rules/var PREPROC_RULE_PATH \/etc\/snort\/preproc_rules/g" /etc/snort/snort.conf
+
+#Caminhos das regras de IP
+sudo sed -i "s/var WHITE_LIST_PATH ..\/rules/var WHITE_LIST_PATH \/etc\/snort\/rules\/iplists/g" /etc/snort/snort.conf
+sudo sed -i "s/var BLACK_LIST_PATH ..\/rules/var BLACK_LIST_PATH \/etc\/snort\/rules\/iplists/g" /etc/snort/snort.conf
+
+
 }
 
 ROT=$(id -u)
