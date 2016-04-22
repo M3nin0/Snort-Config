@@ -3,12 +3,22 @@
 # Defina aqui seu usuario e senha
 # NOTE: A indentação deve se manter!
 #
+
 snorby: &snorby
   adapter: mysql
-  username: root
-  password: "MySqlROOTpassword" # Example: password: "s3cr3tsauce"
+  username: snorby
+  password: "PASSWORD123" # Sua senha
   host: localhost
 
 
 development:
-... and so on
+  database: snorby
+  <<: *snorby
+
+test:
+  database: snorby
+  <<: *snorby
+
+production:
+  database: snorby
+  <<: *snorby
