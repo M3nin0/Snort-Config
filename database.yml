@@ -1,0 +1,14 @@
+# Configuração do banco de dados Snorby
+#
+# Defina aqui seu usuario e senha
+# NOTE: A indentação deve se manter!
+#
+snorby: &snorby
+  adapter: mysql
+  username: root
+  password: "MySqlROOTpassword" # Example: password: "s3cr3tsauce"
+  host: localhost
+
+
+development:
+... and so on
