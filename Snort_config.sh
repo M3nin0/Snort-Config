@@ -93,6 +93,14 @@ cd ~/snort_src/snort-2.9.8.2/src/dynamic-preprocessors/build/usr/local/lib/snort
 sudo cp * /etc/local/lib/snort_dynamicrules
 
 sudo sed -i "s/include \$RULE\_PATH/#include \$RULE\_PATH/" /etc/snort/snort.conf
+
+#Gerando copia de segurança das configuraçoes
+sudo cp /etc/snort/snort.conf /etc/snort/snort.BAK
+
+echo "Digite o IP e a classe que sera utilizado (Exemplo:10.0.0.0/24): "
+read IPCLASS
+sudo sed -i "s/# Setup the network addresses you are protecting/ipvar HOME_NET $IPCLASS/g" /etc/snort/snort.conf
+
 }
 
 ROT=$(id -u)
