@@ -212,6 +212,11 @@ sudo apt-get install -y imagemagick apache2 libyaml-dev libxml2-dev libxslt-dev 
 echo "gem: --no-rdoc --no-ri" > ~/.gemrc
 sudo sh -c "echo gem: --no-rdoc --no-ri > /etc/gemrc"
 
+#Instalando dependencias
+sudo gem install wkhtmltopdf
+sudo gem install bundler
+sudo gem install rake --version=0.9.2
+
 
 #Instalando dependencia do Rails
 gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
@@ -229,10 +234,6 @@ gem update
 rvm use ruby-2.3.0@rails4.2 --create
 gem install rails
 
-#Instalando dependencias
-sudo gem install wkhtmltopdf
-sudo gem install bundler
-sudo gem install rake --version=0.9.2
 
 #Baixando e instalando Snorby
 cd ~/snort_src/
