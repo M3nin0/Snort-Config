@@ -180,7 +180,7 @@ wget https://github.com/finchy/pulledpork/archive/8b9441aeeb7e1477e5be415f27dbc4
 tar xvfvz pulledpork-0.7.2-196.tar.gz
 mv pulledpork-8b9441aeeb7e1477e5be415f27dbc4eb25dd9d59 pulledpork-0.7.2-196
 cd pulledpork-0.7.2-196/
-sudo cp pulledpork.pl /usr/local/bin
+sudo cp ~/Snort-config/pulledpork.pl /usr/local/bin
 sudo chmod +x /usr/local/bin/pulledpork.pl
 sudo cp etc/*.conf /etc/snort
 
@@ -199,11 +199,11 @@ echo "include $RULE_PATH/snort.rules" >> /etc/snort/snort.conf
 sudo chmod 644 /etc/snort/snort.conf
 
 #Script de inicializaçao
-sudo cp snort.script /etc/init/snort.conf
+sudo cp ~/Snort-config/snort.script /etc/init/snort.conf
 sudo chmod +x /etc/init/snort.conf
 initctl list | grep snort
 
-sudo cp barnyard2.script /etc/init/barnyard2.conf
+sudo cp ~/Snort-config/barnyard2.script /etc/init/barnyard2.conf
 sudo chmod +x /etc/init/barnyard2.conf
 initctl list | grep barnyard
 
@@ -243,7 +243,7 @@ cd /var/www/snorby
 sudo bundle install
 
 #Configurando acesso ao banco de dados
-sudo cp database.yml /etc/www/snorby/config/
+sudo cp ~/Snort-config/database.yml /etc/www/snorby/config/
 
 #Copiando configuraçoes do Snorby
 sudo cp /var/www/snorby/config/snorby_config.yml.example /var/www/snorby/config/snorby_config.yml
@@ -291,7 +291,7 @@ sudo a2enmod passenger
 sudo service apache2 restart
 
 #Copiando site do Snorby
-sudo cp snorby.script /etc/apache2/sites-available/
+sudo cp ~/Snort-config/snorby.script /etc/apache2/sites-available/
 
 #Carregando as configuraçoes
 cd /etc/apache2/sites-available/
