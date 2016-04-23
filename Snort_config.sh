@@ -94,7 +94,7 @@ sudo cp * /usr/local/lib/snort_dynamicpreprocessor/
 sudo cp /etc/snort/snort.conf /etc/snort/snort.BAK_INIT
 
 #Escolhendo IP da rede a ser protegida
-sudo sed -i "s/10.0.0.0\/24/192.168.0.0\/24/g" /etc/snort/snort.conf
+sudo sed -i "s/10.0.0.0\/24/ipvar HOME_NET 192.168.0.0\/24/g" /etc/snort/snort.conf
 
 #Escrevendo caminho das regras
 sudo sed -i "s/var RULE_PATH ..\/rules/var RULE_PATH \/etc\/snort\/rules/g" /etc/snort/snort.conf
@@ -171,7 +171,7 @@ mysql -u root -psenha -e "$SQL" mysql
 # Instalaçao PulledPork
 
 #Instalando Pre-requisitos
-sudo apt-get install -y libcrypt-ssleay-perl liblwp-useragent-determined-perl
+sudo apt-get install -y libcrypt-ssleay-perl liblwp-useragent-determined-perl 
 
 #Baixando PulledPork
 cd ~/snort_src
@@ -203,11 +203,11 @@ sudo cp ~/Snort-config/snort.script /etc/init/snort.conf
 sudo chmod +x /etc/init/snort.conf
 initctl list | grep snort
 
-sudo cp ~/Snort-config/barnyard2.script /etc/init/barnyard2.conf
+sudo cp barnyard2.script /etc/init/barnyard2.conf
 sudo chmod +x /etc/init/barnyard2.conf
 initctl list | grep barnyard
 
-sudo apt-get install -y imagemagick apache2 libyaml-dev libxml2-dev libxslt-dev git
+sudo apt-get install -y imagemagick apache2 libyaml-dev libxml2-dev libxslt-dev git ruby1.9.3
 
 echo "gem: --no-rdoc --no-ri" > ~/.gemrc
 sudo sh -c "echo gem: --no-rdoc --no-ri > /etc/gemrc"
@@ -216,7 +216,6 @@ sudo sh -c "echo gem: --no-rdoc --no-ri > /etc/gemrc"
 sudo gem install wkhtmltopdf
 sudo gem install bundler
 sudo gem install rake --version=0.9.2
-
 
 #Instalando dependencia do Rails
 gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
@@ -234,7 +233,6 @@ gem update
 rvm use ruby-2.3.0@rails4.2 --create
 gem install rails
 
-
 #Baixando e instalando Snorby
 cd ~/snort_src/
 wget https://github.com/Snorby/snorby/archive/v2.6.2.tar.gz -O snorby-2.6.2.tar.gz
@@ -243,7 +241,7 @@ sudo cp -r ./snorby-2.6.2/ /var/www/snorby/
 cd /var/www/snorby
 sudo bundle install
 
-#Configurando acesso ao banco de dados
+#Configurando acesso ao banco de dados 
 sudo cp ~/Snort-config/database.yml /etc/www/snorby/config/
 
 #Copiando configuraçoes do Snorby
@@ -311,10 +309,8 @@ sudo chmod o-r /etc/snort/barnyard2.conf
 #Reiniciando serviços
 sudo service barnyard2 restart
 
-sudo cp snorby_init.script /etc/init/snorby_worker.conf
+sudo cp ~/Snort-config/snorby_init.script /etc/init/snorby_worker.conf
 sudo chmod +x /etc/init/snorby_worker.conf
-
-
 
 }
 
