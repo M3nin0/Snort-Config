@@ -190,7 +190,8 @@ sleep 3
 
 #Alterando configuraçao do PulledPork
 sudo mv /etc/snort/pulledpork.conf /etc/snort/pulledpork.BAK
-sudo cp pulledpork.conf /etc/snort/pulledpork.conf
+sudo cp  ~/Snort-config/pulledpork.conf /etc/snort/pulledpork.conf
+
 #Baixando regras
 sudo /usr/local/bin/pulledpork.pl -c /etc/snort/pulledpork.conf -l
 
