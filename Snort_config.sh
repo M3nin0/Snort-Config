@@ -178,7 +178,7 @@ cd ~/snort_src
 wget https://github.com/finchy/pulledpork/archive/8b9441aeeb7e1477e5be415f27dbc4eb25dd9d59.tar.gz \
 -O pulledpork-0.7.2-196.tar.gz
 tar xvfvz pulledpork-0.7.2-196.tar.gz
-mv pulledpork-8b9441aeeb7e1477e5be415f27dbc4eb25dd9d59 pulledpork-0.7.2-19
+mv pulledpork-8b9441aeeb7e1477e5be415f27dbc4eb25dd9d59 pulledpork-0.7.2-196
 cd pulledpork-0.7.2-196/
 sudo cp pulledpork.pl /usr/local/bin
 sudo chmod +x /usr/local/bin/pulledpork.pl
