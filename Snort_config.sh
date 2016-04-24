@@ -6,7 +6,8 @@ echo "Apos os updates reinicie a maquina"
 sleep 3
 clear
 sudo apt-get update
-sudo apt-get upgrade -y
+sudo apt-get dist-upgrade -y
+sudo apt-get install -y openssh-server
 echo "Reinicie o equipamento se ainda nao o fez"
 sleep 10
 
@@ -24,7 +25,7 @@ cd ~/snort_src
 sudo apt-get install -y bison flex
 
 #Instalando DAQ 2.0.6
-wget https://snort.org/downloads/snort/daq-2.0.6.tar.gz
+wget https://www.snort.org/downloads/snort/daq-2.0.6.tar.gz
 tar xvfz daq-2.0.6.tar.gz
 cd daq-2.0.6
 ./configure && make && sudo make install
@@ -32,8 +33,9 @@ cd daq-2.0.6
 #Iniciando instalaçao do Snort
 #Instalando dependencias
 sudo apt-get install -y zlib1g-dev liblzma-dev openssl libssl-dev
-cd ~/snort_src
-wget https://snort.org/downloads/snort/snort-2.9.8.2.tar.gz
+
+#Instalando Snort
+wget https://www.snort.org/downloads/snort/snort-2.9.8.2.tar.gz
 tar xvfz snort-2.9.8.2.tar.gz
 cd snort-2.9.8.2
 ./configure --enable-sourcefire && make && sudo make install
@@ -83,18 +85,19 @@ sudo chown -R snort:snort /etc/snort
 sudo chown -R snort:snort /var/log/snort
 sudo chown -R snort:snort /usr/local/lib/snort_dynamicrules
 
-cd ~/snort_src/snort-2.9.8.0/etc/
+cd ~/snort_src/snort-2.9.8.2/etc/
 sudo cp *.conf* /etc/snort
 sudo cp *.map /etc/snort
 sudo cp *.dtd /etc/snort
-cd ~/snort_src/snort-2.9.8.0/src/dynamic-preprocessors/build/usr/local/lib/snort_dynamicpreprocessor/
+cd ~/snort_src/snort-2.9.8.2/src/dynamic-preprocessors/build/usr/local/lib/snort_dynamicpreprocessor/
 sudo cp * /usr/local/lib/snort_dynamicpreprocessor/
 
 #Gerando copia de segurança das configuraçoes
 sudo cp /etc/snort/snort.conf /etc/snort/snort.BAK_INIT
 
+sudo sed -i "s/include \$RULE\_PATH/#include \$RULE\_PATH/" /etc/snort/snort.conf
 #Escolhendo IP da rede a ser protegida
-sudo sed -i "s/10.0.0.0\/24/ipvar HOME_NET 192.168.0.0\/24/g" /etc/snort/snort.conf
+sudo sed -i "s/ipvar HOME_NET any/ipvar HOME_NET 192.168.0.0\/24/g" /etc/snort/snort.conf
 
 #Escrevendo caminho das regras
 sudo sed -i "s/var RULE_PATH ..\/rules/var RULE_PATH \/etc\/snort\/rules/g" /etc/snort/snort.conf
@@ -110,7 +113,7 @@ sudo sed -i "s/#include $RULE_PATH\/local.rules/include $RULE_PATH\/local.rules/
 
 #Validando configuraçao
 sudo snort -T -i eth0 -c /etc/snort/snort.conf
-
+sleep 5
 #Copia das configuraçoes feitas
 sudo cp /etc/snort/snort.conf /etc/snort/snort.BAK_RULES
 
@@ -168,6 +171,12 @@ read dbpass
 SQL="create database $datab; use $datab; source ~/snort_src/barnyard2-2-1.14-336/schemas/create_mysql; CREATE USER '$dbuser'@'localhost' IDENTIFIED BY '$dbpass'; grant create, insert, select, delete, update on $datab.* to '$dbuser'@'localhost';"
 mysql -u root -psenha -e "$SQL" mysql
 
+sudo chmod 777 /etc/snort/barnyard2.conf
+sudo echo "output database: log, mysql, user=$dbuser password=$dbpass dbname=$datab host=localhost" >> /etc/snort/barnyard2.conf
+sudo chmod 644 /etc/snort/barnyard2.conf
+
+sudo chmod o-r /etc/snort/barnyard2.conf
+
 # Instalaçao PulledPork
 
 #Instalando Pre-requisitos
@@ -180,7 +189,7 @@ wget https://github.com/finchy/pulledpork/archive/8b9441aeeb7e1477e5be415f27dbc4
 tar xvfvz pulledpork-0.7.2-196.tar.gz
 mv pulledpork-8b9441aeeb7e1477e5be415f27dbc4eb25dd9d59 pulledpork-0.7.2-196
 cd pulledpork-0.7.2-196/
-sudo cp ~/Snort-config/pulledpork.pl /usr/local/bin
+sudo cp pulledpork.pl /usr/local/bin
 sudo chmod +x /usr/local/bin/pulledpork.pl
 sudo cp etc/*.conf /etc/snort
 
@@ -199,12 +208,15 @@ sudo chmod 777 /etc/snort/snort.conf
 echo "include $RULE_PATH/snort.rules" >> /etc/snort/snort.conf
 sudo chmod 644 /etc/snort/snort.conf
 
+#Validando regras
+sudo snort -T -c /etc/snort/snort.conf -i eth0
+
 #Script de inicializaçao
 sudo cp ~/Snort-config/snort.script /etc/init/snort.conf
 sudo chmod +x /etc/init/snort.conf
 initctl list | grep snort
 
-sudo cp barnyard2.script /etc/init/barnyard2.conf
+sudo cp ~/Snort-config/barnyard2.script /etc/init/barnyard2.conf
 sudo chmod +x /etc/init/barnyard2.conf
 initctl list | grep barnyard
 
@@ -221,6 +233,10 @@ sudo gem install rake --version=0.9.2
 #Instalando dependencia do Rails
 gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 \curl -sSL https://get.rvm.io | bash -s stable --ruby
+\curl -sSL https://get.rvm.io | bash -s stable
+\curl -sSL https://get.rvm.io | bash -s -- --ignore-dotfiles
+echo "source $HOME/.rvm/scripts/rvm" >> ~/.bash_profile
+\curl -sSL https://get.rvm.io | sudo bash -s stable
 source /etc/profile
 rvm get stable --autolibs=enable
 rvm install ruby
@@ -238,12 +254,16 @@ gem install rails
 cd ~/snort_src/
 wget https://github.com/Snorby/snorby/archive/v2.6.2.tar.gz -O snorby-2.6.2.tar.gz
 tar xzvf snorby-2.6.2.tar.gz
-sudo cp -r ./snorby-2.6.2/ /var/www/snorby/
-cd /var/www/snorby
+sudo cp -r ./snorby-2.6.2/ /var/www/html/snorby/
+cd /var/www/html/snorby
 sudo bundle install
 
-#Configurando acesso ao banco de dados 
-sudo cp ~/Snort-config/database.yml /etc/www/snorby/config/
+sudo cp /var/www/html/snorby/config/database.yml.example /var/www/html/snorby/config/database.yml
+
+#Inserindo Root para criar banco de dados Snorby
+echo "Insira sua senha de root do MySQL"
+read sqlpass
+sudo sed -i "s/Enter Password Here/$sqlpass/g" /var/www/html/snorby/database.yml 
 
 #Copiando configuraçoes do Snorby
 sudo cp /var/www/snorby/config/snorby_config.yml.example /var/www/snorby/config/snorby_config.yml
@@ -261,13 +281,16 @@ read dbuser1
 echo "Senha do usuario: "
 read dbpass1
 
-SQL1="create user '$dbuser1'@'localhost' IDENTIFIED BY ' dbpass1 ' ; grant all privileges on snorby.* to 'snorby'@'localhost' with grant option; flush privileges;"
+SQL1="create user '$dbuser1'@'localhost' IDENTIFIED BY ' $dbpass1 ' ; grant all privileges on snorby.* to 'snorby'@'localhost' with grant option; flush privileges;"
 mysql -u root -psenha -e "$SQL1" mysql
 
-cd /var/www/snorby/
-sudo bundle exec rails server -e production
+#Colocando Nova senha
+sudo sed -i "s/root/$dbuser1/g" /var/www/html/snorby/database.yml 
+sudo sed -i "s/$sqlpass/$dbpass1/g" /var/www/html/snorby/database.yml 
 
-#Instalando e configurando o Apache
+cd /var/www/html/snorby/
+
+#Configurando o Apache
 #Instalando Pre-requisitos
 sudo apt-get install -y libcurl4-openssl-dev apache2-threaded-dev libaprutil1-dev libapr1-dev
 sudo gem install passenger
@@ -276,31 +299,37 @@ sudo passenger-install-apache2-module
 #Gerando arquivos de configuraçao Apache
 sudo touch /etc/apache2/mods-available/passenger.load
 sudo chmod 777 /etc/apache2/mods-available/passenger.load
-sudo echo "LoadModule passenger_module /var/lib/gems/1.9.1/gems/passenger-5.0.21/buildout/apache2/mod_passenger.so" >> /etc/apache2/mods-available/passenger.load
+
+#Esta opçao pode variar em sua instalaçao
+#Faça a verificaçao e caso necessario aletere no arquivo passanger.load
+sudo echo "LoadModule passenger_module /var/lib/gems/1.9.1/gems/passenger-5.0.27/buildout/apache2/mod_passenger.so" >> /etc/apache2/mods-available/passenger.load
 sudo chmod 644 /etc/apache2/mods-available/passenger.load 
 
 sudo touch /etc/apache2/mods-available/passenger.conf
 sudo chmod 777 /etc/apache2/mods-available/passenger.conf
-echo "PassengerRoot /var/lib/gems/1.9.1/gems/passenger-5.0.21" >> /etc/apache2/mods-available/passenger.conf
+#Estas sao outras opçoes podem variar de acordo com instalaçao
+echo "PassengerRoot /var/lib/gems/1.9.1/gems/passenger-5.0.27" >> /etc/apache2/mods-available/passenger.conf
 echo "PassengerDefaultRuby /usr/bin/ruby1.9.1" >> /etc/apache2/mods-available/passenger.conf
 sudo chmod 644 /etc/apache2/mods-available/passenger.conf 
 
 
 #Reiniciando o Serviço Apache
-sudo a2enmod passenger
 sudo service apache2 restart
+sudo a2enmod passenger
 
 #Copiando site do Snorby
 sudo cp ~/Snort-config/snorby.script /etc/apache2/sites-available/
 
 #Carregando as configuraçoes
 cd /etc/apache2/sites-available/
-sudo a2ensite snorby.conf
 sudo service apache2 reload
+sudo a2ensite snorby.conf
+
 
 cd /etc/apache2/sites-enabled
-sudo a2dissite 000-default
 sudo service apache2 reload
+sudo a2dissite 000-default
+
 
 sudo chmod 777 /etc/snort/barnyard2.conf
 sudo echo "output database: log, mysql, user=snorby password=PASSWORD123 dbname=snorby host=localhost sensor_name=sensor1" >> /etc/snort/barnyard2.conf
@@ -310,6 +339,7 @@ sudo chmod o-r /etc/snort/barnyard2.conf
 #Reiniciando serviços
 sudo service barnyard2 restart
 
+#Fazendo script de inicializaçao
 sudo cp ~/Snort-config/snorby_init.script /etc/init/snorby_worker.conf
 sudo chmod +x /etc/init/snorby_worker.conf
 
