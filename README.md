@@ -6,8 +6,10 @@ para um script, e assim facilitar a vida de que quer fazer a configuração de f
 
 # Versão 0.2
 
-*Realizando ajustes na configuração dos blocos de IP
-*Automatizando as configurações de regras
+*Sistema automatizado de configuração
+
+*Realiza todas as configurações Snort automaticamente
+
 
 # Importante
 
