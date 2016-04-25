@@ -13,7 +13,12 @@ para um script, e assim facilitar a vida de que quer fazer a configuração de f
 
 # Importante
 
-Mesmo que tenha utilizado os comandos do tutorial Snort.org, ajustei eles as minhas configurações, então verifique o script antes 
-de executalo
+Para que o script funcione corretamente é necessario seguir alguns passos:
+
+*Definir a senha do MySQL nos campos -p"suasenha" sem aspas;
+
+*Apos o termino da execução do script verificar as linhas nos arquivos de configuração do Snorby, já que estas podem variar de acordo com seu equipamento;
+
+*Configurar a placa de rede antes da execução;
 
 Espero ajudar o maximo possivel, e obrigado ao Snort.org pelo exelente tutorial!!!
