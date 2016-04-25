@@ -281,7 +281,7 @@ read dbuser1
 echo "Senha do usuario: "
 read dbpass1
 
-SQL1="create user '$dbuser1'@'localhost' IDENTIFIED BY ' $dbpass1 ' ; grant all privileges on snorby.* to 'snorby'@'localhost' with grant option; flush privileges;"
+SQL1="create user '$dbuser1'@'localhost' IDENTIFIED BY ' $dbpass1 ' ; grant all privileges on snorby.* to '$dbuser1'@'localhost' with grant option; flush privileges;"
 mysql -u root -psenha -e "$SQL1" mysql
 
 #Colocando Nova senha
