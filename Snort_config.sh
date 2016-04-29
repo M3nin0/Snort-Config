@@ -35,6 +35,7 @@ cd daq-2.0.6
 sudo apt-get install -y zlib1g-dev liblzma-dev openssl libssl-dev
 
 #Instalando Snort
+cd ~/snort_src
 wget https://www.snort.org/downloads/snort/snort-2.9.8.2.tar.gz
 tar xvfz snort-2.9.8.2.tar.gz
 cd snort-2.9.8.2
@@ -318,7 +319,7 @@ sudo service apache2 restart
 sudo a2enmod passenger
 
 #Copiando site do Snorby
-sudo cp ~/Snort-config/snorby.script /etc/apache2/sites-available/
+sudo cp ~/Snort-config/snorby.script /etc/apache2/sites-available/snorby.conf
 
 #Carregando as configuraçoes
 cd /etc/apache2/sites-available/
