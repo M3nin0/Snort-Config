@@ -110,7 +110,7 @@ sudo sed -i "s/var WHITE_LIST_PATH ..\/rules/var WHITE_LIST_PATH \/etc\/snort\/r
 sudo sed -i "s/var BLACK_LIST_PATH ..\/rules/var BLACK_LIST_PATH \/etc\/snort\/rules\/iplists/g" /etc/snort/snort.conf
 
 #Ativando regras locais
-sudo sed -i "s/#include $RULE_PATH\/local.rules/include $RULE_PATH\/local.rules/g" /etc/snort/snort.conf
+sudo sed -i "s/#include \$RULE\_PATH\/local.rules/include \$RULE\_PATH\/local.rules/g" /etc/snort/snort.conf
 
 #Validando configuraçao
 sudo snort -T -i eth0 -c /etc/snort/snort.conf
@@ -205,9 +205,8 @@ sudo cp  ~/Snort-config/pulledpork.conf /etc/snort/pulledpork.conf
 #Baixando regras
 sudo /usr/local/bin/pulledpork.pl -c /etc/snort/pulledpork.conf -l
 
-sudo chmod 777 /etc/snort/snort.conf
-echo "include $RULE_PATH/snort.rules" >> /etc/snort/snort.conf
-sudo chmod 644 /etc/snort/snort.conf
+#Definindo caminho das configurações do Snort
+sudo sed -i "s/#include \$RULE\_PATH\/app-detect.rules/include \$RULE\_PATH\/snort.rules/g" /etc/snort/snort.conf
 
 #Validando regras
 sudo snort -T -c /etc/snort/snort.conf -i eth0
