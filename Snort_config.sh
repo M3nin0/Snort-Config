@@ -263,15 +263,14 @@ sudo cp /var/www/html/snorby/config/database.yml.example /var/www/html/snorby/co
 #Inserindo Root para criar banco de dados Snorby
 echo "Insira sua senha de root do MySQL"
 read sqlpass
-sudo sed -i "s/Enter Password Here/$sqlpass/g" /var/www/html/snorby/database.yml 
+sudo sed -i "s/Enter Password Here/$sqlpass/g" /var/www/html/snorby/config/database.yml
 
 #Copiando configuraçoes do Snorby
-sudo cp /var/www/snorby/config/snorby_config.yml.example /var/www/snorby/config/snorby_config.yml
-sudo sed -i s/"\/usr\/local\/bin\/wkhtmltopdf"/"\/usr\/bin\/wkhtmltopdf"/g \
-/var/www/snorby/config/snorby_config.yml
+sudo cp /var/www/html/snorby/config/snorby_config.yml.example /var/www/html/snorby/config/snorby_config.yml
+sudo sed -i s/"\/usr\/local\/bin\/wkhtmltopdf"/"\/usr\/bin\/wkhtmltopdf"/g \/var/www/html/snorby/config/snorby_config.yml
 
 #Configurando Snorby
-cd /var/www/snorby
+cd /var/www/html/snorby
 sudo bundle exec rake snorby:setup
 
 #Criando banco de dados Snorby
@@ -285,10 +284,8 @@ SQL1="create user '$dbuser1'@'localhost' IDENTIFIED BY ' $dbpass1 ' ; grant all 
 mysql -u root -psenha -e "$SQL1" mysql
 
 #Colocando Nova senha
-sudo sed -i "s/root/$dbuser1/g" /var/www/html/snorby/database.yml 
-sudo sed -i "s/$sqlpass/$dbpass1/g" /var/www/html/snorby/database.yml 
-
-cd /var/www/html/snorby/
+sudo sed -i "s/root/$dbuser1/g" /var/www/html/snorby/config/database.yml
+sudo sed -i "s/$sqlpass/$dbpass1/g" /var/www/html/snorby/config/database.yml
 
 #Configurando o Apache
 #Instalando Pre-requisitos
@@ -302,37 +299,38 @@ sudo chmod 777 /etc/apache2/mods-available/passenger.load
 
 #Esta opçao pode variar em sua instalaçao
 #Faça a verificaçao e caso necessario aletere no arquivo passanger.load
-sudo echo "LoadModule passenger_module /var/lib/gems/1.9.1/gems/passenger-5.0.27/buildout/apache2/mod_passenger.so" >> /etc/apache2/mods-available/passenger.load
+
+sudo echo "LoadModule passenger_module /var/lib/gems/1.9.1/gems/passenger-5.0.28/buildout/apache2/mod_passenger.so" >> /etc/apache2/mods-available/passenger.load 
 sudo chmod 644 /etc/apache2/mods-available/passenger.load 
 
 sudo touch /etc/apache2/mods-available/passenger.conf
 sudo chmod 777 /etc/apache2/mods-available/passenger.conf
+
 #Estas sao outras opçoes podem variar de acordo com instalaçao
-echo "PassengerRoot /var/lib/gems/1.9.1/gems/passenger-5.0.27" >> /etc/apache2/mods-available/passenger.conf
+echo "PassengerRoot /var/lib/gems/1.9.1/gems/passenger-5.0.28" >> /etc/apache2/mods-available/passenger.conf
 echo "PassengerDefaultRuby /usr/bin/ruby1.9.1" >> /etc/apache2/mods-available/passenger.conf
 sudo chmod 644 /etc/apache2/mods-available/passenger.conf 
 
 
 #Reiniciando o Serviço Apache
-sudo service apache2 restart
 sudo a2enmod passenger
+sudo service apache2 restart
 
 #Copiando site do Snorby
 sudo cp ~/Snort-config/snorby.script /etc/apache2/sites-available/snorby.conf
 
 #Carregando as configuraçoes
 cd /etc/apache2/sites-available/
-sudo service apache2 reload
 sudo a2ensite snorby.conf
-
-
-cd /etc/apache2/sites-enabled
 sudo service apache2 reload
+
+#Desativando antigo site 
 sudo a2dissite 000-default
+sudo service apache2 reload
 
 
 sudo chmod 777 /etc/snort/barnyard2.conf
-sudo echo "output database: log, mysql, user=snorby password=PASSWORD123 dbname=snorby host=localhost sensor_name=sensor1" >> /etc/snort/barnyard2.conf
+sudo echo "output database: log, mysql, user=dbuser1 password=dbpass1 dbname=snorby host=localhost sensor_name=sensor1" >> /etc/snort/barnyard2.conf
 sudo chmod 644 /etc/snort/barnyard2.conf
 sudo chmod o-r /etc/snort/barnyard2.conf
 
