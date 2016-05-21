@@ -200,7 +200,7 @@ sleep 3
 
 #Alterando configuraçao do PulledPork
 mv /etc/snort/pulledpork.conf /etc/snort/pulledpork.BAK
-cp  ~/Snort-config/pulledpork.conf /etc/snort/pulledpork.conf
+cp  ~/Snort-Config/pulledpork.conf /etc/snort/pulledpork.conf
 
 #Baixando regras
 /usr/local/bin/pulledpork.pl -c /etc/snort/pulledpork.conf -l
@@ -212,11 +212,11 @@ sed -i "s/#include \$RULE\_PATH\/app-detect.rules/include \$RULE\_PATH\/snort.ru
 snort -T -c /etc/snort/snort.conf -i eth0
 
 #Script de inicializaçao
-cp ~/Snort-config/snort.script /etc/init/snort.conf
+cp ~/Snort-Config/snort.script /etc/init/snort.conf
 chmod +x /etc/init/snort.conf
 initctl list | grep snort
 
-cp ~/Snort-config/barnyard2.script /etc/init/barnyard2.conf
+cp ~/Snort-Config/barnyard2.script /etc/init/barnyard2.conf
 chmod +x /etc/init/barnyard2.conf
 initctl list | grep barnyard
 
