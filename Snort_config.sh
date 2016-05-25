@@ -168,9 +168,11 @@ echo "Nome do usuario para o banco de dados: "
 read dbuser
 echo "Senha do usuario: "
 read dbpass
+echo "Insira a senha do Root SQL"
+read rtpass
 
 SQL="create database $datab; use $datab; source ~/snort_src/barnyard2-2-1.14-336/schemas/create_mysql; CREATE USER '$dbuser'@'localhost' IDENTIFIED BY '$dbpass'; grant create, insert, select, delete, update on $datab.* to '$dbuser'@'localhost';"
-mysql -u root -psenha -e "$SQL" mysql
+mysql -u root -p$rtpass -e "$SQL" mysql
 
 chmod 777 /etc/snort/barnyard2.conf
 echo "output database: log, mysql, user=$dbuser password=$dbpass dbname=$datab host=localhost" >> /etc/snort/barnyard2.conf
