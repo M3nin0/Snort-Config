@@ -1,15 +1,6 @@
 #!/bin/bash
 
-snort_config(){
-echo "Realizando os updates!!!"
-echo "Apos os updates reinicie a maquina"
-sleep 3
-clear
-apt-get update
-apt-get dist-upgrade -y
-apt-get install -y openssh-server
-echo "Reinicie o equipamento se ainda nao o fez"
-sleep 10
+config_Snort(){
 
 echo "Iniciando configuraçao do Snort"
 sleep 3
@@ -117,7 +108,9 @@ snort -T -i eth0 -c /etc/snort/snort.conf
 sleep 5
 #Copia das configuraçoes feitas
 cp /etc/snort/snort.conf /etc/snort/snort.BAK_RULES
+}
 
+config_bndr(){
 #Iniciando instalaçao do Barnyard2
 
 apt-get install -y mysql-server libmysqlclient-dev mysql-client autoconf libtool
@@ -179,7 +172,9 @@ echo "output database: log, mysql, user=$dbuser password=$dbpass dbname=$datab h
 chmod 644 /etc/snort/barnyard2.conf
 
 chmod o-r /etc/snort/barnyard2.conf
+}
 
+config_ppok(){
 # Instalaçao PulledPork
 
 #Instalando Pre-requisitos
@@ -212,7 +207,9 @@ sed -i "s/#include \$RULE\_PATH\/app-detect.rules/include \$RULE\_PATH\/snort.ru
 
 #Validando regras
 snort -T -c /etc/snort/snort.conf -i eth0
+}
 
+init_script(){
 #Script de inicializaçao
 cp ~/Snort-Config/snort.script /etc/init/snort.conf
 chmod +x /etc/init/snort.conf
@@ -221,13 +218,81 @@ initctl list | grep snort
 cp ~/Snort-Config/barnyard2.script /etc/init/barnyard2.conf
 chmod +x /etc/init/barnyard2.conf
 initctl list | grep barnyard
-
 }
+
+
+install_snorby(){
+
+echo "Instalando o Snorby"
+
+apt-get install -y imagemagick apache2 libyaml-dev libxml2-dev libxslt-dev git ruby1.9.3
+echo "gem: --no-rdoc --no-ri" > ~/.gemrc
+sh -c "echo gem: --no-rdoc --no-ri > /etc/gemrc"
+gem install wkhtmltopdf
+gem install bundler
+
+menu(){
+echo "Realizando os updates!!!"
+echo "Apos os updates reinicie a maquina"
+sleep 3
+clear
+apt-get update
+apt-get dist-upgrade -y
+apt-get install -y openssh-server
+echo "Reinicie o equipamento se ainda nao o fez"
+sleep 10
+
+echo "Selecione o que deseja fazer:"
+echo "1 - Instalar o Snort"
+echo "2 - Instalar o Barnyard2"
+echo "3 - Instalar o PulledPork"
+echo "4 - Instalar o Snorby"
+echo "5 - Gerar scripts de inicializaçao"
+read opcao
+
+case $opcao in
+
+1)
+echo "Instalaçao do Snort"
+	config_Snort
+
+;;
+
+2)
+echo "Instalaçao do Barnyard2"
+	config_bndr
+
+;;
+
+3)
+echo "Instalaçao do PulledPork"
+	config_ppok
+
+;;
+4)
+echo "Instalando o Snorby"
+	install_snorby
+	
+;;
+
+5)
+echo "Criaçao de script de inicializaçao"
+	init_script
+
+;;
+*)
+echo "Opçao Invalida!!!"
+echo "Voltando ao Menu"
+sleep 5	
+	menu
+esac
+}
+
 
 ROT=$(id -u)
 
 if [ "$ROT" = "0" ];then
-	snort_config
+	menu
 
 else
 	echo "O script abre apenas com ROOT"
