@@ -1,24 +1,28 @@
-# Snort-Config
-Simples Shell que ajuda na instalação do Snort 2.9.8.X
-
-Todo este script se baseia nas configurações que o site Snort.org disponibilizou, apenas tranferi os comandos ditos no tutorial
-para um script, e assim facilitar a vida de que quer fazer a configuração de forma automatizada
-
-# Versão 0.2
+# Versão 0.3
 
 *Sistema automatizado de configuração
 
-*Realiza todas as configurações Snort automaticamente
+*Realiza todas as configurações Snort automaticamente (Modo HIDS)
 
+*Faz a instalação do Snorby
+
+*Tambem faz a instalação e configuração do PulledPork e suas regras, bem como o Barnyard2
+
+*Facil de ser utilizado
 
 # Importante
 
 Para que o script funcione corretamente é necessario seguir alguns passos:
 
-*Definir a senha do MySQL nos campos -p"suasenha" sem aspas;
-
-*Apos o termino da execução do script verificar as linhas nos arquivos de configuração do Snorby, já que estas podem variar de acordo com seu equipamento;
+```
+*Execute como SUDO
 
 *Configurar a placa de rede antes da execução;
 
-Espero ajudar o maximo possivel, e obrigado ao Snort.org pelo exelente tutorial!!!
+*As saidas das instalações Passanger são diferentes, configureas de acordo com suas saidas
+
+```
+
+# Licensa
+
+Este codigo esta seguindo a licença  GNU GENERAL PUBLIC LICENSE V3
