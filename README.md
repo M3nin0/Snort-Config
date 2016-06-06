@@ -25,4 +25,4 @@ Para que o script funcione corretamente é necessario seguir alguns passos:
 
 # Licensa
 
-Este codigo esta seguindo a licença  GNU GENERAL PUBLIC LICENSE V3
+Este código está sob a licença GNU GENERAL PUBLIC LICENSE V3
