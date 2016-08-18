@@ -219,111 +219,6 @@ cp ~/Snort-Config/barnyard2.script /etc/init/barnyard2.conf
 chmod +x /etc/init/barnyard2.conf
 initctl list | grep barnyard
 
-
-cp ~/Snort-Config/snorby_init.script /etc/init/snorby_worker.conf
-chmod +x /etc/init/snorby_worker.conf
-initctl list | grep snorby_worker
-}
-
-
-install_snorby(){
-
-echo "Instalando o Snorby"
-
-apt-get install -y imagemagick apache2 libyaml-dev libxml2-dev libxslt-dev git ruby1.9.3
-echo "gem: --no-rdoc --no-ri" > ~/.gemrc
-sh -c "echo gem: --no-rdoc --no-ri > /etc/gemrc"
-gem install wkhtmltopdf
-gem install bundler
-gem install rake --version=0.9.2
-gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-\curl -sSL https://get.rvm.io | bash -s stable --ruby
-source /etc/profile
-source ~/.rvm/scripts/rvm
-rvm install 2.1
-rvm use 2.1
-gem install rails
-
-cd ~/snort_src/
-wget https://github.com/Snorby/snorby/archive/v2.6.2.tar.gz -O snorby-2.6.2.tar.gz
-tar xzvf snorby-2.6.2.tar.gz
-cp -r ./snorby-2.6.2/ /var/www/html/snorby/
-
-cd /var/www/html/snorby
-bundle install
-
-cp /var/www/html/snorby/config/database.yml.example /var/www/html/snorby/config/database.yml
-
-echo "Insira a senha do Root Mysql"
-read senha
-sed -i "s/Enter Password Here/$senha/g" /var/www/html/snorby/config/database.yml
-
-cp /var/www/html/snorby/config/snorby_config.yml.example /var/www/html/snorby/config/snorby_config.yml
-sed -i s/"\/usr\/local\/bin\/wkhtmltopdf"/"\/usr\/bin\/wkhtmltopdf"/g /var/www/html/snorby/config/snorby_config.yml
-
-cd /var/www/html/snorby
-bundle exec rake snorby:setup
-
-#Configurando SQL para o Snorby
-echo "Nome de seu banco de dados:"
-read datab
-echo "Nome do usuario para o banco de dados: "
-read dbuser
-echo "Senha do usuario: "
-read dbpass
-echo "Insira a senha do Root SQL"
-read rtpass
-
-
-SQL="create database $datab; use $datab; CREATE USER '$dbuser'@'localhost' IDENTIFIED BY '$dbpass'; grant create, insert, select, delete, update on $datab.* to '$dbuser'@'localhost';"
-mysql -u root -p$rtpass -e "$SQL" mysql
-
-SQL="create database $datab; use $datab; source ~/snort_src/barnyard2-2-1.14-336/schemas/create_mysql; CREATE USER '$dbuser'@'localhost' IDENTIFIED BY '$dbpass'; grant create, insert, select, delete, update on $datab.* to '$dbuser'@'localhost';"
-mysql -u root -p$rtpass -e "$SQL" mysql
-
-chmod 777 /etc/snort/barnyard2.conf
-echo "output database: log, mysql, user=$dbuser password=$dbpass dbname=$datab host=localhost" >> /etc/snort/barnyard2.conf
-chmod 644 /etc/snort/barnyard2.conf
-
-chmod o-r /etc/snort/barnyard2.conf
-
-sed -i "s/root/$dbuser/g" /var/www/html/snorby/config/database.yml
-sed -i "s/$senha/$dbpass/g" /var/www/html/snorby/config/database.yml
-
-#Instalando Phusion Passenger
-
-apt-get install -y libcurl4-openssl-dev apache2-threaded-dev libaprutil1-dev libapr1-dev
-gem install passenger
-passenger-install-apache2-module
-
-
-echo "Insira a saida do comando acima nos seguintes arquivos"
-echo "LoadModule passenger_module /var/lib/gems/1.9.1/gems/passenger-5.0.21/buildout/apache2/mod_passenger.so"
-echo "A saida acima equivalente pode variar de acordo com versoes, verifique a sua antes de colocalo no arquivo"
-echo "A saida LoadModule insira no arquivo --> /etc/apache2/mods-available/passenger.load"
-echo "Já o Passager com as saidas:
-			PassengerRoot /var/lib/gems/1.9.1/gems/passenger-5.0.21
-			PassengerDefaultRuby /usr/bin/ruby1.9.1 
-	Insira no arquivo --> /etc/apache2/mods-available/passenger.conf"
-
-a2enmod passenger
-service apache2 restart
-apache2ctl -t -D DUMP_MODULES
-
-cp ~/Snort-Config/site.snorby /etc/apache2/sites-available/snorby.conf
-
-cd /etc/apache2/sites-available/
-a2ensite snorby.conf
-service apache2 reload
- 
-cd /etc/apache2/sites-enabled
-a2dissite 000-default
-service apache2 reload
-
-echo "output database: log, mysql, user=$dbuser password=$dbpass dbname=$datab host=localhost sensor_name=sensor1" >> /etc/snort/barnyard2.conf
-
-service barnyard2 restart
-
 }
 
 menu(){
@@ -341,8 +236,7 @@ echo "Selecione o que deseja fazer:"
 echo "1 - Instalar o Snort"
 echo "2 - Instalar o Barnyard2"
 echo "3 - Instalar o PulledPork"
-echo "4 - Instalar o Snorby"
-echo "5 - Gerar scripts de inicializaçao"
+echo "4 - Gerar scripts de inicializaçao"
 read opcao
 
 case $opcao in
@@ -364,13 +258,9 @@ echo "Instalaçao do PulledPork"
 	config_ppok
 
 ;;
-4)
-echo "Instalando o Snorby"
-	install_snorby
-	
-;;
 
-5)
+
+4)
 echo "Criaçao de script de inicializaçao"
 	init_script
 
