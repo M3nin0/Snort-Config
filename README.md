@@ -4,8 +4,6 @@
 
 *Realiza todas as configurações Snort automaticamente (Modo HIDS)
 
-*Faz a instalação do Snorby
-
 *Tambem faz a instalação e configuração do PulledPork e suas regras, bem como o Barnyard2
 
 *Facil de ser utilizado
@@ -19,7 +17,6 @@ Para que o script funcione corretamente é necessario seguir alguns passos:
 
 *Configurar a placa de rede antes da execução;
 
-*As saidas das instalações Passanger são diferentes, configureas de acordo com suas saidas
 
 ```
 
