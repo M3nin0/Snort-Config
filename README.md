@@ -20,6 +20,6 @@ Para que o script funcione corretamente é necessario seguir alguns passos:
 
 ```
 
-# Licensa
+# Licença
 
 Este código está sob a licença GNU GENERAL PUBLIC LICENSE V3
